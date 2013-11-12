@@ -76,7 +76,7 @@ module.exports = function(grunt) {
             return fileContents;
         }
 
-        function generateSASSFile (imageData, images, placeholder, scssSyntax) {
+        /*function generateSASSFile (imageData, images, placeholder, scssSyntax) {
             var fileContents = '',
                 pathParts = [],
                 spritePathsParts = [],
@@ -94,6 +94,30 @@ module.exports = function(grunt) {
             fileContents += "%" + placeholder + (scssSyntax ? ' {' : '') + '\n' + '    background: url("../' + pathParts.join('/') + '") no-repeat' + (scssSyntax ? ';\n }' : '') + '\n\n';
             imageData.heights.forEach(function (height, idx) {
                 fileContents += '%' + (classPrefix === '' ? '' : classPrefix + '-') + path.basename(images[idx], '.png') + (scssSyntax ? ' {' : '') + '\n    @extend ' + '%' + placeholder + (scssSyntax ? ' ;' : '') + '\n' + '    background-position: 0 ' +  (height - imageData.maxheight) + 'px' + (scssSyntax ? ';\n }' : '') + '\n\n';
+            });
+
+            return fileContents;
+        }*/
+
+        function generateSASSFileTemp (imageData, images, placeholder, scssSyntax) {
+            var fileContents = '',
+                pathParts = [],
+                spritePathsParts = [],
+                cssPathParts = [];
+
+            spritePathsParts = spriteMap.split(pathSeparator);
+            cssPathParts = cssFile.split(pathSeparator);
+
+            spritePathsParts.forEach(function (pathPart, idx) {
+                if (pathPart !== cssPathParts[idx]) {
+                    pathParts.push(pathPart);
+                }
+            });
+
+            fileContents += "@mixin " + placeholder + (scssSyntax ? ' {' : '') + '\n' + '    background: url("../' + pathParts.join('/') + '") no-repeat' + (scssSyntax ? ';\n }' : '') + '\n\n';
+            imageData.heights.forEach(function (height, idx) {
+                var name = path.basename(images[idx], '.png').replace(/\./g, '_');
+                fileContents += '@mixin ' + (classPrefix === '' ? '' : classPrefix + '-') + name + (scssSyntax ? ' {' : '') + '\n    @include ' + placeholder + (scssSyntax ? ';' : '') + '\n' + '    background-position: 0 ' +  (height - imageData.maxheight) + 'px' + (scssSyntax ? ';\n }' : '') + '\n\n';
             });
 
             return fileContents;
@@ -166,10 +190,10 @@ module.exports = function(grunt) {
 
                     switch (output){
                         case "scss":
-                            stylesData = generateSASSFile(incomingData, processedImageFiles, placeHolder, true);
+                            stylesData = generateSASSFileTemp(incomingData, processedImageFiles, placeHolder, true);
                             break;
                         case "sass":
-                            stylesData = generateSASSFile(incomingData, processedImageFiles, placeHolder);
+                            stylesData = generateSASSFileTemp(incomingData, processedImageFiles, placeHolder);
                             break;
                         case "less":
                             stylesData = generateLESSFile(incomingData, processedImageFiles, placeHolder);
