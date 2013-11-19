@@ -76,9 +76,10 @@ module.exports = function(grunt) {
         function generateSASSFile (imageData, images, placeholder, scssSyntax) {
             var fileContents = '';
 
-            fileContents += "%" + placeholder + (scssSyntax ? ' {' : '') + '\n' + '    background: url("' + generateBackgroundImagePath() + '") no-repeat' + (scssSyntax ? ';\n }' : '') + '\n\n';
+            fileContents += "@mixin " + placeholder + (scssSyntax ? ' {' : '') + '\n' + '    background: url("' + generateBackgroundImagePath() + '") no-repeat' + (scssSyntax ? ';\n }' : '') + '\n\n';
             imageData.heights.forEach(function (height, idx) {
-                fileContents += '%' + (classPrefix === '' ? '' : classPrefix + '-') + path.basename(images[idx].file, '.png') + (scssSyntax ? ' {' : '') + '\n    @extend ' + '%' + placeholder + (scssSyntax ? ' ;' : '') + '\n' + '    background-position: 0 ' +  -height + 'px' + (scssSyntax ? ';\n }' : '') + '\n\n';
+                var name = path.basename(images[idx].file, '.png').replace(/\./g, '_');
+                fileContents += '@mixin ' + (classPrefix === '' ? '' : classPrefix + '-') + name + (scssSyntax ? ' {' : '') + '\n    @include ' + placeholder + (scssSyntax ? ' ;' : '') + '\n' + '    background-position: 0 ' +  -height + 'px' + (scssSyntax ? ';\n }' : '') + '\n\n';
             });
 
             return fileContents;
